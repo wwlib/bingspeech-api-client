@@ -1,33 +1,17 @@
 export interface VoiceRecognitionResponse {
-    version: string;
-    header: {
-        status: string;
-        scenario: string;
-        name: string;
-        lexical: string;
-        properties: {
-            requestid: string;
-            NOSPEECH?: string;
-            FALSERECO?: string;
-            HIGHCONF?: string;
-            MIDCONF?: string;
-            LOWCONF?: string;
-        }
-    };
-    results: {
-        scenario: string;
-        name: string;
-        lexical: string;
-        confidence: string;
-        properties: {
-            NOSPEECH?: string;
-            FALSERECO?: string;
-            HIGHCONF?: string;
-            MIDCONF?: string;
-            LOWCONF?: string;
-        }
-    }[];
-};
+    RecognitionStatus: string;
+    Offset: number;
+    Duration: number;
+    NBest: VoiceRecognitionUtterance[]
+}
+
+export interface VoiceRecognitionUtterance {
+    Confidence: number;
+    Lexical: string;
+    ITN: string;
+    MaskedITN: string;
+    Display: string;
+}
 
 /**
  * @deprecated Use streaming mode instead. Will be removed in 2.x

@@ -11,12 +11,12 @@
     "bin"
   ],
   "scripts": {
-    "build": "npm run clean && npm run compile",
+    "build": "yarn clean && yarn compile",
     "clean": "rm -fR ./lib",
     "compile": "tsc",
     "lint": "tslint './src/**/*.ts'",
-    "prepublish": "npm run build",
-    "test": "npm run build && mocha -R spec 'lib/**/*.spec.js'"
+    "prepublish": "yarn build",
+    "test": "yarn build && mocha -R spec 'lib/**/*.spec.js'"
   },
   "repository": {
     "type": "git",

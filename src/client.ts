@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import * as util from 'util';
-import * as uuid from 'uuid';
+// import * as util from 'util';
+// import * as uuid from 'uuid';
 import * as needle from 'needle';
 import * as stream from 'stream';
 import * as querystring from 'querystring';
@@ -52,9 +52,9 @@ const VOICES: { [key: string]: string } = {
 // TTS https://www.microsoft.com/cognitive-services/en-us/speech-api/documentation/api-reference-rest/bingvoiceoutput
 
 export class BingSpeechClient {
-    private BING_SPEECH_TOKEN_ENDPOINT = 'https://api.cognitive.microsoft.com/sts/v1.0/issueToken';
-    private BING_SPEECH_ENDPOINT_STT = 'https://speech.platform.bing.com/recognize';
-    private BING_SPEECH_ENDPOINT_TTS = 'https://speech.platform.bing.com/synthesize';
+    private BING_SPEECH_TOKEN_ENDPOINT = 'https://azurespeechserviceeast.cognitiveservices.azure.com/sts/v1.0/issuetoken';
+    private BING_SPEECH_ENDPOINT_STT = 'https://eastus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1';
+    private BING_SPEECH_ENDPOINT_TTS = 'https://eastus.tts.speech.microsoft.com/cognitiveservices/v1';
 
     private subscriptionKey: string;
 
@@ -95,20 +95,18 @@ export class BingSpeechClient {
                 this.tokenExpirationDate = Date.now() + 9 * 60 * 1000;
 
                 let params = {
-                    'scenarios': 'ulm',
-                    'appid': 'D4D52672-91D7-4C74-8AD8-42B1D98141A5', // magic value as per MS docs
-                    'locale': locale,
-                    'device.os': '-',
-                    'version': '3.0',
-                    'format': 'json',
-                    'requestid': uuid.v4(), // can be anything
-                    'instanceid': uuid.v4() // can be anything
-                };
+                    language: "en-US",
+                    format: "detailed"
+                }
 
                 let options = {
                     headers: {
+                        'Accept': 'application/json;text/xml',
                         'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': 'audio/wav; codec="audio/pcm"; samplerate=16000'
+                        'Content-Type': 'audio/wav; codec="audio/pcm"; samplerate=16000',
+                        'Ocp-Apim-Subscription-Key': this.subscriptionKey,
+                        'Transfer-Encoding': "chunked",
+                        'Expect': '100-continue'
                     },
                     open_timeout: 5000,
                     read_timeout: 5000
@@ -123,13 +121,12 @@ export class BingSpeechClient {
                         if (res.statusCode !== 200) {
                             return reject(new Error(`Wrong status code ${res.statusCode} in Bing Speech API / synthesize`));
                         }
-
                         resolve(body);
                     });
                 });
             })
             .catch((err: Error) => {
-                throw new Error(`Voice recognition failed miserably: ${err.message}`);
+                throw new Error(`bingspeech-api-client: Voice recognition failed : ${err.message}`);
             });
     }
 
@@ -153,7 +150,7 @@ export class BingSpeechClient {
                 });
             })
             .catch((err: Error) => {
-                throw new Error(`Voice synthesis failed miserably: ${err.message}`);
+                throw new Error(`bingspeech-api-client: Voice synthesis failed: ${err.message}`);
             });
     }
 
@@ -197,11 +194,11 @@ export class BingSpeechClient {
                 return needle.post(this.BING_SPEECH_ENDPOINT_TTS, ssml, options);
             })
             .catch((err: Error) => {
-                throw new Error(`Voice synthesis failed miserably: ${err.message}`);
+                throw new Error(`bingspeech-api-client: Voice synthesis failed: ${err.message}`);
             });
     }
 
-    private issueToken(): Promise<string> {
+    public issueToken(): Promise<string> {
         if (this.token && this.tokenExpirationDate > Date.now()) {
             debug('reusing existing token');
             return Promise.resolve(this.token);

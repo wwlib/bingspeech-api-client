@@ -40,3 +40,5 @@ node_modules
 typings/
 lib/
 src/**/*.js
+
+hide

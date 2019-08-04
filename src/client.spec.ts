@@ -6,30 +6,26 @@ import * as nock from 'nock';
 
 describe('Bing Speech API client', () => {
     it('should recognize a voice', () => {
-        const mockResponse: VoiceRecognitionResponse = {
-              version: '3.0',
-              header: {
-                  status: 'success',
-                  scenario: 'ulm',
-                  name: 'i have a dream',
-                  lexical: 'i have a dream',
-                  properties: {
-                      requestid: '862cc972-d1dd-4a76-b0a8-829ecd03c4c3',
-                      HIGHCONF: '1'
-                  }
-              },
-              results: [
-                  {
-                      scenario: 'ulm',
-                      name: 'i have a dream',
-                      lexical: 'i have a dream',
-                      confidence: '0.96075',
-                      properties: {
-                          HIGHCONF: '1'
-                      }
-                  }
-              ]
-        };
+        const mockResponse: VoiceRecognitionResponse = { 
+            RecognitionStatus: 'Success',
+            Offset: 9000000,
+            Duration: 13400000,
+            NBest: 
+            [ { Confidence: 0.9616049528121948,
+                Lexical: 'what\'s the weather look like today',
+                ITN: 'What\'s the weather look like today',
+                MaskedITN: 'What\'s the weather look like today',
+                Display: 'What\'s the weather look like today?' },
+            { Confidence: 0.9034169912338257,
+                Lexical: 'how\'s the weather look like today',
+                ITN: 'how\'s the weather look like today',
+                MaskedITN: 'how\'s the weather look like today',
+                Display: 'how\'s the weather look like today' },
+            { Confidence: 0.9055131077766418,
+                Lexical: 'how does the weather look like today',
+                ITN: 'how does the weather look like today',
+                MaskedITN: 'how does the weather look like today',
+                Display: 'how does the weather look like today' } ] };
 
         nock('https://api.cognitive.microsoft.com')
             .post('/sts/v1.0/issueToken')
